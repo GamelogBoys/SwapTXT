@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account - SwapTxt</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes shrink {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
+    .animate-progress {
+      animation: shrink 5000ms linear forwards;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex items-center justify-center p-4 antialiased">
+
+  <!-- TOP-RIGHT FLASH TOAST CONTAINER -->
+  <div id="flash-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none">
+    <% if (flashMessages && (flashMessages.success?.length || flashMessages.error?.length || flashMessages.warn?.length)) { %>
+      
+      <!-- SUCCESS FLASH -->
+      <% if (flashMessages.success && flashMessages.success.length > 0) { %>
+        <% flashMessages.success.forEach(msg => { %>
+          <div class="toast-card pointer-events-auto bg-white border border-emerald-200 shadow-xl rounded-xl overflow-hidden transition-all duration-300 transform translate-x-0">
+            <div class="p-4 flex items-start gap-3">
+              <div class="text-emerald-500 flex-shrink-0 mt-0.5">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              </div>
+              <div class="flex-1 text-sm font-medium text-slate-700"><%= msg %></div>
+              <button onclick="dismissToast(this.closest('.toast-card'))" class="text-slate-400 hover:text-slate-600 font-bold text-lg leading-none">&times;</button>
+            </div>
+            <div class="h-1 bg-emerald-500 animate-progress"></div>
+          </div>
+        <% }) %>
+      <% } %>
+
+      <!-- WARN FLASH -->
+      <% if (flashMessages.warn && flashMessages.warn.length > 0) { %>
+        <% flashMessages.warn.forEach(msg => { %>
+          <div class="toast-card pointer-events-auto bg-white border border-amber-200 shadow-xl rounded-xl overflow-hidden transition-all duration-300 transform translate-x-0">
+            <div class="p-4 flex items-start gap-3">
+              <div class="text-amber-500 flex-shrink-0 mt-0.5">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+              </div>
+              <div class="flex-1 text-sm font-medium text-slate-700"><%= msg %></div>
+              <button onclick="dismissToast(this.closest('.toast-card'))" class="text-slate-400 hover:text-slate-600 font-bold text-lg leading-none">&times;</button>
+            </div>
+            <div class="h-1 bg-amber-500 animate-progress"></div>
+          </div>
+        <% }) %>
+      <% } %>
+
+      <!-- ERROR FLASH -->
+      <% if (flashMessages.error && flashMessages.error.length > 0) { %>
+        <% flashMessages.error.forEach(msg => { %>
+          <div class="toast-card pointer-events-auto bg-white border border-rose-200 shadow-xl rounded-xl overflow-hidden transition-all duration-300 transform translate-x-0">
+            <div class="p-4 flex items-start gap-3">
+              <div class="text-rose-500 flex-shrink-0 mt-0.5">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              </div>
+              <div class="flex-1 text-sm font-medium text-slate-700"><%= msg %></div>
+              <button onclick="dismissToast(this.closest('.toast-card'))" class="text-slate-400 hover:text-slate-600 font-bold text-lg leading-none">&times;</button>
+            </div>
+            <div class="h-1 bg-rose-500 animate-progress"></div>
+          </div>
+        <% }) %>
+      <% } %>
+
+    <% } %>
+  </div>
+
+  <!-- REGISTER FORM CONTAINER CARD -->
+  <main class="w-full max-w-md bg-white border border-slate-200 rounded-2xl shadow-xl p-8 space-y-6">
+    
+    <!-- BRAND LOGO / TITLE -->
+    <div class="text-center">
+      <div class="w-12 h-12 bg-indigo-600 text-white rounded-xl flex items-center justify-center mx-auto mb-3 shadow-md">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+      </div>
+      <h1 class="text-2xl font-bold text-slate-900">Create an account</h1>
+      <p class="text-sm text-slate-500 mt-1">Connect with anyone using just an email address</p>
+    </div>
+
+    <!-- SIGNUP FORM -->
+    <form action="/register" method="POST" class="space-y-4">
+      
+      <!-- FULL NAME FIELD -->
+      <div class="space-y-1">
+        <label for="displayName" class="block text-sm font-medium text-slate-700">Full Name</label>
+        <input type="text" id="displayName" name="displayName" placeholder="John Doe" required
+          class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition" />
+      </div>
+
+      <!-- EMAIL ID FIELD -->
+      <div class="space-y-1">
+        <label for="email" class="block text-sm font-medium text-slate-700">Email Address</label>
+        <input type="email" id="email" name="email" placeholder="name@example.com" required
+          class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition" />
+      </div>
+
+      <!-- PASSWORD FIELD WITH SHOW/HIDE TOGGLE -->
+      <div class="space-y-1">
+        <label for="password" class="block text-sm font-medium text-slate-700">Password</label>
+        <div class="relative">
+          <input type="password" id="password" name="password" placeholder="••••••••" required
+            class="w-full px-4 py-2.5 pr-11 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition" />
+          
+          <button type="button" onclick="toggleVisibility('password', 'eye-pass', 'eye-off-pass')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none">
+            <svg id="eye-pass" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <svg id="eye-off-pass" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908A9.954 9.954 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m-4.692-4.692a3 3 0 00-4.243-4.243" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- CONFIRM PASSWORD FIELD WITH SHOW/HIDE TOGGLE -->
+      <div class="space-y-1">
+        <label for="confirmPassword" class="block text-sm font-medium text-slate-700">Confirm Password</label>
+        <div class="relative">
+          <input type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••••" required
+            class="w-full px-4 py-2.5 pr-11 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition" />
+          
+          <button type="button" onclick="toggleVisibility('confirmPassword', 'eye-confirm', 'eye-off-confirm')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none">
+            <svg id="eye-confirm" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <svg id="eye-off-confirm" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908A9.954 9.954 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m-4.692-4.692a3 3 0 00-4.243-4.243" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- TERMS & CONDITIONS CHECKBOX -->
+      <div class="flex items-center gap-2 pt-1">
+        <input type="checkbox" id="terms" name="terms" required
+          class="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 accent-indigo-600 cursor-pointer" />
+        <label for="terms" class="text-xs text-slate-600">
+          I agree to the <a href="/terms" class="text-indigo-600 hover:underline">Terms of Service</a> & <a href="/privacy" class="text-indigo-600 hover:underline">Privacy Policy</a>
+        </label>
+      </div>
+
+      <!-- SUBMIT BUTTON -->
+      <button type="submit" class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all transform active:scale-[0.99] mt-2">
+        Continue
+      </button>
+
+    </form>
+
+    <!-- TOGGLE TO LOGIN -->
+    <div class="text-center pt-2 border-t border-slate-100">
+      <p class="text-sm text-slate-600">
+        Already have an account? 
+        <a href="/" class="text-indigo-600 font-semibold hover:underline">Log In</a>
+      </p>
+    </div>
+
+  </main>
+
+  <!-- JS FOR SLIDE-OUT TOASTS & REUSABLE SHOW/HIDE PASSWORD -->
+  <script>
+    // Dismiss toast function
+    function dismissToast(element) {
+      if (!element) return;
+      element.classList.add('translate-x-full', 'opacity-0');
+      setTimeout(() => element.remove(), 300);
+    }
+
+    // Auto-dismiss flash toasts after 5 seconds
+    document.addEventListener('DOMContentLoaded', () => {
+      const toasts = document.querySelectorAll('.toast-card');
+      toasts.forEach(toast => {
+        setTimeout(() => dismissToast(toast), 5000);
+      });
+    });
+
+    // Universal Password Visibility Toggle
+    function toggleVisibility(inputId, eyeId, eyeOffId) {
+      const input = document.getElementById(inputId);
+      const eye = document.getElementById(eyeId);
+      const eyeOff = document.getElementById(eyeOffId);
+
+      if (input.type === 'password') {
+        input.type = 'text';
+        eye.classList.add('hidden');
+        eyeOff.classList.remove('hidden');
+      } else {
+        input.type = 'password';
+        eye.classList.remove('hidden');
+        eyeOff.classList.add('hidden');
+      }
+    }
+  </script>
+</body>
+</html>
