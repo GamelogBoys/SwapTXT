@@ -60,7 +60,7 @@ const sendOTPVerificationEmail = async (email, displayName) => {
 
     return true
   } catch (error) {
-    console.error('Error sending OTP email:', error);
+    console.error('Error sending OTP email:', error.response?.text || error.message);
     throw error
   }
 }
