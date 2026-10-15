@@ -1,4 +1,3 @@
-const SibApiV3Sdk = require('@getbrevo/brevo')
 const OTP = require('../models/otp.model.js')
 
 const sendOTPVerificationEmail = async (email, displayName) => {
@@ -6,8 +5,8 @@ const sendOTPVerificationEmail = async (email, displayName) => {
     const otp = Math.floor(1000 + Math.random() * 9000).toString()
 
     await OTP.deleteMany({ email })
-
     await OTP.create({ email, otp })
+
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -45,22 +44,30 @@ const sendOTPVerificationEmail = async (email, displayName) => {
       </html>
     `
 
-    // Send email using Brevo HTTP API (bypasses Render's blocked SMTP ports)
-    const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi()
-    const apiKey = apiInstance.authentications['apiKey']
-    apiKey.apiKey = process.env.BREVO_API_KEY
+    // Direct HTTP request to Brevo API v3 (No SDK constructor issues)
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': process.env.BREVO_API_KEY,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        sender: { name: "SwapTxt", email: process.env.EMAIL_USER },
+        to: [{ email: email }],
+        subject: `${otp} is your verification code`,
+        htmlContent: htmlContent
+      })
+    })
 
-    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail()
-    sendSmtpEmail.subject = `${otp} is your verification code`
-    sendSmtpEmail.htmlContent = htmlContent
-    sendSmtpEmail.sender = { name: "SwapTxt", email: process.env.EMAIL_USER }
-    sendSmtpEmail.to = [{ email: email }]
-
-    await apiInstance.sendTransacEmail(sendSmtpEmail)
+    if (!response.ok) {
+      const errData = await response.text()
+      throw new Error(`Brevo API error: ${errData}`)
+    }
 
     return true
   } catch (error) {
-    console.error('Error sending OTP email:', error.response?.text || error.message);
+    console.error('Error sending OTP email:', error.message || error)
     throw error
   }
 }
