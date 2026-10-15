@@ -1,16 +1,5 @@
-const nodemailer = require('nodemailer')
+const SibApiV3Sdk = require('@getbrevo/brevo')
 const OTP = require('../models/otp.model.js')
-
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  },
-  connectionTimeout: 10000,
-  socketTimeout: 10000
-})
 
 const sendOTPVerificationEmail = async (email, displayName) => {
   try {
@@ -55,12 +44,19 @@ const sendOTPVerificationEmail = async (email, displayName) => {
       </body>
       </html>
     `
-    await transporter.sendMail({
-      from: `"SwapTxt" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: `${otp} is your verification code`,
-      html: htmlContent
-    })
+
+    // Send email using Brevo HTTP API (bypasses Render's blocked SMTP ports)
+    const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi()
+    const apiKey = apiInstance.authentications['apiKey']
+    apiKey.apiKey = process.env.BREVO_API_KEY
+
+    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail()
+    sendSmtpEmail.subject = `${otp} is your verification code`
+    sendSmtpEmail.htmlContent = htmlContent
+    sendSmtpEmail.sender = { name: "SwapTxt", email: process.env.EMAIL_USER }
+    sendSmtpEmail.to = [{ email: email }]
+
+    await apiInstance.sendTransacEmail(sendSmtpEmail)
 
     return true
   } catch (error) {
