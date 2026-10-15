@@ -54,6 +54,7 @@ Live Demo: [swaptxt.onrender.com](https://swaptxt.onrender.com)
    SESSION_SECRET=your_super_secret_key
    EMAIL_USER=your_email@gmail.com
    EMAIL_PASS=your_email_app_password
+   BREVO_API_KEY=your_brevo_smtp_key
    ```
 
 4. Start the application:
